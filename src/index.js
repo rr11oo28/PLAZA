@@ -1,15 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom'; // Shuni qo'shish kerak
 import App from './App';
-// Registratsiya faylini import qilamiz
-import * as serviceWorkerRegistration from './serviceWorkerRegistration'; 
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    {/* App componentini BrowserRouter bilan o'raymiz */}
+    <BrowserRouter> 
+      <App />
+    </BrowserRouter>
   </React.StrictMode>
 );
 
-// Shuni register() qilib qo'yamiz
 serviceWorkerRegistration.register();
