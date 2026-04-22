@@ -228,7 +228,7 @@ const Home = () => {
             }}
           >
             <QRCodeCanvas value={window.location.origin} size={200} fgColor="#000" bgColor="transparent" />
-            <p style={{ marginTop: '20px', fontWeight: 'bold', color: '#000', fontSize: '18px' }}>Plaza Menu</p>
+            <p style={{ marginTop: '20px', fontWeight: 'bold', color: '#000', fontSize: 'var(--font-size-18)' }}>Plaza Menu</p>
             <Button onClick={() => setIsQrOpen(false)} style={{ marginTop: '15px', width: '100%' }}>OK</Button>
           </div>
         </div>
