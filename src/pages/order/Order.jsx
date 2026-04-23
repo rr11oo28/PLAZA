@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { 
@@ -22,74 +22,61 @@ import Footer from '../footer/Footer';
 const Order = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const lang = localStorage.getItem('lang') || 'uz';
+  const lang = useMemo(() => localStorage.getItem('lang') || 'uz', []);
 
   const [activeNav, setActiveNav] = useState('Hammasi');
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-
   const [userName, setUserName] = useState('');
   const [tableNum, setTableNum] = useState('');
 
-  // --- TILGA QARAB MATNLAR ---
+  // --- SMART GREETING (Warninglarsiz) ---
+  const getGreeting = useCallback(() => {
+    const hour = new Date().getHours();
+    if (lang === 'uz') {
+      if (hour >= 5 && hour < 12) return "Xayrli tong! Nonushta qildingizmi? ☕";
+      if (hour >= 12 && hour < 17) return "Xayrli kun! Mazali tushlik vaqti bo'ldi 🍲";
+      if (hour >= 17 && hour < 22) return "Xayrli kech! Kechki ovqatga nima buyurtma qilamiz? 🌙";
+      return "Tungi taomlar o'zgacha gasht beradi, shunday emasmi? ✨";
+    } else {
+      if (hour >= 5 && hour < 12) return "Доброе утро! Позавтракаем? ☕";
+      if (hour >= 12 && hour < 17) return "Добрый день! Время вкусного обеда 🍲";
+      if (hour >= 17 && hour < 22) return "Добрый вечер! Что закажем на ужин? 🌙";
+      return "Ночные перекусы имеют особый вкус, не так ли? ✨";
+    }
+  }, [lang]);
+
   const t = useMemo(() => {
     const content = {
       uz: {
-        back: "Orqaga",
-        title: "Plaza menu",
-        subTitle: "Sifatli va halol taomlarimiz siz uchun.",
-        cartBtn: "Savatcha",
-        emptyCart: "Savatchangiz bo'sh",
-        checkout: "Buyurtma berish",
-        total: "Jami",
-        confirmTitle: "Tasdiqlash",
-        nameLabel: "To'liq ism va familiyangiz",
-        namePlaceholder: "Ism va familiyangizni kiriting",
-        tableLabel: "Stol raqami",
-        qrNotice: "(QR orqali aniqlandi)",
-        cancel: "Orqaga",
-        confirm: "Yuborish",
-        add: "qo`shish",
+        back: "Orqaga", title: "Plaza menu", subTitle: getGreeting(),
+        cartBtn: "Savatcha", emptyCart: "Savatchangiz bo'sh", checkout: "Buyurtma berish",
+        total: "Jami", confirmTitle: "Tasdiqlash", nameLabel: "To'liq ism va familiyangiz",
+        namePlaceholder: "Ism va familiyangizni kiriting", tableLabel: "Stol raqami",
+        qrNotice: "(QR orqali aniqlandi)", cancel: "Orqaga", confirm: "Yuborish", add: "qo`shish",
         addedNotify: "Savatchaga qo'shildi! +1",
         navs: ['Hammasi', 'Asosiy taomlar', 'Salatlar', 'Ichimliklar', 'Shirinliklar'],
         errName: "Iltimos, ism va familiyangizni to'liq kiriting!",
-        errTable: "Stol raqamini to'g'ri kiriting!",
-        errEmpty: "Savatchangiz bo'sh!",
-        errNet: "Xatolik! Internetni tekshiring.",
-        success: "Buyurtmangiz qabul qilindi!",
-        som: "so'm"
+        errTable: "Stol raqamini to'g'ri kiriting!", errEmpty: "Savatchangiz bo'sh!",
+        errNet: "Xatolik! Internetni tekshiring.", success: "Buyurtmangiz qabul qilindi!", som: "so'm"
       },
       ru: {
-        back: "Назад",
-        title: "Меню Plaza",
-        subTitle: "Наши качественные и халяльные блюда для вас.",
-        cartBtn: "Корзина",
-        emptyCart: "Ваша корзина пуста",
-        checkout: "Оформить заказ",
-        total: "Итого",
-        confirmTitle: "Подтверждение",
-        nameLabel: "Полное имя и фамилия",
-        namePlaceholder: "Введите ваше имя и фамилию",
-        tableLabel: "Номер стола",
-        qrNotice: "(Определено по QR)",
-        cancel: "Назад",
-        confirm: "Отправить",
-        add: "добавить",
+        back: "Назад", title: "Меню Plaza", subTitle: getGreeting(),
+        cartBtn: "Корзина", emptyCart: "Ваша корзина пуста", checkout: "Оформить заказ",
+        total: "Итого", confirmTitle: "Подтверждение", nameLabel: "Полное имя и фамилия",
+        namePlaceholder: "Введите ваше имя и фамилию", tableLabel: "Номер стола",
+        qrNotice: "(Определено по QR)", cancel: "Назад", confirm: "Отправить", add: "добавить",
         addedNotify: "Добавлено в корзину! +1",
         navs: ['Все', 'Основные блюда', 'Салаты', 'Напитки', 'Десерты'],
         errName: "Пожалуйста, введите полное имя и фамилию!",
-        errTable: "Введите правильный номер стола!",
-        errEmpty: "Ваша корзина пуста!",
-        errNet: "Ошибка! Проверьте интернет.",
-        success: "Ваш заказ принят!",
-        som: "сум"
+        errTable: "Введите правильный номер стола!", errEmpty: "Ваша корзина пуста!",
+        errNet: "Ошибка! Проверьте интернет.", success: "Ваш заказ принят!", som: "сум"
       }
     };
     return content[lang] || content.uz;
-  }, [lang]);
+  }, [lang, getGreeting]);
 
-  // --- TAOMLAR RO'YXATI ---
   const orderCards = useMemo(() => [
     { id: 1, img: imgOne, title: lang === 'uz' ? 'Asosiy taom' : 'Основное блюдо', desc: lang === 'uz' ? 'Taomning qisqacha tavsifi' : 'Краткое описание блюда', price: '10000', category: lang === 'uz' ? 'Asosiy taomlar' : 'Основные блюда' },
     { id: 2, img: imgTwo, title: lang === 'uz' ? 'Salat nomi' : 'Название салата', desc: lang === 'uz' ? 'Salatning qisqacha tavsifi' : 'Краткое описание салата', price: '23000', category: lang === 'uz' ? 'Salatlar' : 'Салаты' },
@@ -102,37 +89,29 @@ const Order = () => {
     const params = new URLSearchParams(location.search);
     const table = params.get('table');
     if (table) setTableNum(table);
-  }, [location]);
+  }, [location.search]);
 
-  // --- SAVATCHA FUNKSIYALARI ---
-  const addToCart = (product) => {
-    toast.info(t.addedNotify, {
-      position: "bottom-right",
-      autoClose: 1000,
-      hideProgressBar: true,
-      theme: "colored",
-    });
-
+  const addToCart = useCallback((product) => {
+    toast.info(t.addedNotify, { position: "bottom-right", autoClose: 1000, hideProgressBar: true, theme: "colored" });
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
       return [...prev, { ...product, quantity: 1 }];
     });
-  };
+  }, [t.addedNotify]);
 
-  const removeFromCart = (id) => {
+  const removeFromCart = useCallback((id) => {
     setCart(prev => {
       const existing = prev.find(item => item.id === id);
       if (existing.quantity === 1) return prev.filter(item => item.id !== id);
       return prev.map(item => item.id === id ? { ...item, quantity: item.quantity - 1 } : item);
     });
-  };
+  }, []);
 
   const deleteItem = (id) => setCart(prev => prev.filter(item => item.id !== id));
   const totalPrice = cart.reduce((acc, item) => acc + (parseInt(item.price) * item.quantity), 0);
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0); 
 
-  // --- TELEGRAMGA YUBORISH ---
   const handleFinalSubmit = async (e) => {
     e.preventDefault();
     if (userName.trim().split(' ').length < 2) return toast.error(t.errName, { position: "bottom-right" });
@@ -140,12 +119,8 @@ const Order = () => {
 
     const token = "8708223354:AAHDfvoi7knAt-ruCQDrKlyvpYOMSjlB6OE";
     const chatId = "8162236227";
-    
-    const productList = cart.map((item, index) => 
-        `${index + 1}. *${item.title}* \n   ${item.quantity} ta x ${item.price} = ${parseInt(item.price) * item.quantity} ${t.som}`
-    ).join('\n\n');
-
-    const message = `🍽 *YANGI BUYURTMA (MENU)*\n━━━━━━━━━━━━━━━━━━\n👤 *Mijoz:* ${userName}\n🔢 *Stol:* ${tableNum}-stol\n━━━━━━━━━━━━━━━━━━\n🛒 *MAHSULOTLAR:*\n${productList}\n\n💰 *JAMI:* ${totalPrice} ${t.som}\n━━━━━━━━━━━━━━━━━━`;
+    const productList = cart.map((item, index) => `${index + 1}. *${item.title}* (${item.quantity} ta) - ${parseInt(item.price) * item.quantity} ${t.som}`).join('\n');
+    const message = `🍽 *YANGI BUYURTMA*\n👤 Mijoz: ${userName}\n🔢 Stol: ${tableNum}\n\n🛒 Mahsulotlar:\n${productList}\n💰 Jami: ${totalPrice} ${t.som}`;
 
     try {
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -162,7 +137,7 @@ const Order = () => {
 
   return (
     <OrderPage>
-      <ToastContainer position="bottom-right" autoClose={2000} />
+      <ToastContainer position="top-right" autoClose={2000} />
       
       <AnimatePresence>
         {(isCartOpen || isCheckoutOpen) && (
@@ -174,21 +149,31 @@ const Order = () => {
       </AnimatePresence>
 
       <AnimatePresence>
-        {isCartOpen && (
-          <CartModal 
-            as={motion.div} initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'tween' }} isOpen={true}
+        {totalItems > 0 && !isCartOpen && (
+          <motion.div 
+            initial={{ scale: 0, opacity: 0, y: 50 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0, opacity: 0, y: 50 }}
+            whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setIsCartOpen(true)}
+            style={{
+              position: 'fixed', bottom: '30px', right: '30px', zIndex: 999, backgroundColor: 'var(--primary)', color: 'white',
+              width: '65px', height: '65px', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center',
+              boxShadow: '0px 10px 25px var(--primary)', cursor: 'pointer'
+            }}
           >
+            <span style={{ fontSize: '24px' }}>🛒</span>
+            <span style={{ position: 'absolute', top: '0', right: '0', backgroundColor: 'white', color: 'black', borderRadius: '50%', width: '22px', height: '22px', fontSize: '12px', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '2px solid var(--primary)' }}>{totalItems}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isCartOpen && (
+          <CartModal as={motion.div} initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'tween' }} isOpen={true}>
             <div className="cart-header">
               <h2>{t.cartBtn} ({totalItems})</h2>
               <button className="close-btn" onClick={() => setIsCartOpen(false)}>&times;</button>
             </div>
             <div className="cart-items">
-              {cart.length === 0 ? (
-                <div className="empty-cart" style={{textAlign: 'center', marginTop: '50px'}}>
-                   <div style={{fontSize: '40px'}}>🛒</div>
-                   <p>{t.emptyCart}</p>
-                </div>
-              ) : cart.map(item => (
+              {cart.length === 0 ? <p style={{textAlign: 'center', marginTop: '50px'}}>{t.emptyCart}</p> : cart.map(item => (
                 <CartItemRow as={motion.div} layout key={item.id}>
                   <div className="item-main">
                     <h4>{item.title}</h4>
@@ -196,7 +181,7 @@ const Order = () => {
                   </div>
                   <div className="item-controls" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                     <button className="qty-btn" onClick={() => removeFromCart(item.id)}>-</button>
-                    <span style={{minWidth: '25px', textAlign: 'center'}}>{item.quantity}</span>
+                    <span>{item.quantity}</span>
                     <button className="qty-btn" onClick={() => addToCart(item)}>+</button>
                     <div className="price-total">{parseInt(item.price) * item.quantity} {t.som}</div>
                   </div>
@@ -213,20 +198,11 @@ const Order = () => {
 
       <AnimatePresence>
         {isCheckoutOpen && (
-          <CheckoutModal 
-            as={motion.div} initial={{ opacity: 0, scale: 0.8, x: '-50%', y: '-50%' }} animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }} exit={{ opacity: 0, scale: 0.8, x: '-50%', y: '-50%' }} 
-            style={{ position: 'fixed', left: '50%', top: '50%', zIndex: 1100 }} isOpen={true}
-          >
+          <CheckoutModal as={motion.div} initial={{ opacity: 0, scale: 0.8, x: '-50%', y: '-50%' }} animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }} exit={{ opacity: 0, scale: 0.8, x: '-50%', y: '-50%' }} style={{ position: 'fixed', left: '50%', top: '50%', zIndex: 1100 }} isOpen={true}>
             <h2>{t.confirmTitle}</h2>
             <form onSubmit={handleFinalSubmit}>
-              <InputGroup>
-                <label>{t.nameLabel}</label>
-                <input type="text" placeholder={t.namePlaceholder} value={userName} onChange={(e) => setUserName(e.target.value)} />
-              </InputGroup>
-              <InputGroup>
-                <label>{t.tableLabel} {new URLSearchParams(location.search).get('table') && t.qrNotice}</label>
-                <input type="number" value={tableNum} onChange={(e) => setTableNum(e.target.value)} readOnly={!!new URLSearchParams(location.search).get('table')} style={new URLSearchParams(location.search).get('table') ? {background: '#f0f0f0', cursor: 'not-allowed'} : {}} />
-              </InputGroup>
+              <InputGroup><label>{t.nameLabel}</label><input type="text" placeholder={t.namePlaceholder} value={userName} onChange={(e) => setUserName(e.target.value)} /></InputGroup>
+              <InputGroup><label>{t.tableLabel}</label><input type="number" value={tableNum} onChange={(e) => setTableNum(e.target.value)} readOnly={!!new URLSearchParams(location.search).get('table')} style={new URLSearchParams(location.search).get('table') ? {background: '#f0f0f0'} : {}} /></InputGroup>
               <ModalButtons>
                 <button type="button" className="cancel" onClick={() => setIsCheckoutOpen(false)}>{t.cancel}</button>
                 <button type="submit" className="confirm">{t.confirm}</button>
@@ -241,7 +217,7 @@ const Order = () => {
           <BackButton onClick={() => navigate(-1)}>← {t.back}</BackButton>
           <OrderTitle as={motion.div} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <h1>{t.title}</h1>
-            <p>{t.subTitle}</p>
+            <motion.p key={t.subTitle} initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ fontStyle: 'italic', color: '#666' }}>{t.subTitle}</motion.p>
           </OrderTitle>
         </HeaderWrapper>
 
@@ -251,9 +227,6 @@ const Order = () => {
               <div key={nav} onClick={() => setActiveNav(nav)} className={`nav-item ${activeNav === nav ? 'active' : ''}`}>{nav}</div>
             ))}
           </OrderNav>
-          <motion.button whileTap={{ scale: 0.9 }} className="cart-icon-btn" onClick={() => setIsCartOpen(true)}>
-            🛒 {t.cartBtn} ({totalItems})
-          </motion.button>
         </CartButtonWrapper>
 
         <OrderMenu>
@@ -261,9 +234,7 @@ const Order = () => {
             {filteredCards.map(card => {
               const inCart = cart.find(i => i.id === card.id);
               return (
-                <motion.div 
-                  layout key={card.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="order-card"
-                >
+                <motion.div layout key={card.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="order-card">
                   <img src={card.img} alt={card.title} /> 
                   <h2>{card.title}</h2>
                   <p>{card.desc}</p>
