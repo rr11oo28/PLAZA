@@ -31,7 +31,7 @@ const Order = () => {
   const [userName, setUserName] = useState('');
   const [tableNum, setTableNum] = useState('');
 
-  // --- SMART GREETING (Warninglarsiz) ---
+  // --- SMART GREETING (EN qo'shildi) ---
   const getGreeting = useCallback(() => {
     const hour = new Date().getHours();
     if (lang === 'uz') {
@@ -39,11 +39,16 @@ const Order = () => {
       if (hour >= 12 && hour < 17) return "Xayrli kun! Mazali tushlik vaqti bo'ldi 🍲";
       if (hour >= 17 && hour < 22) return "Xayrli kech! Kechki ovqatga nima buyurtma qilamiz? 🌙";
       return "Tungi taomlar o'zgacha gasht beradi, shunday emasmi? ✨";
-    } else {
+    } else if (lang === 'ru') {
       if (hour >= 5 && hour < 12) return "Доброе утро! Позавтракаем? ☕";
       if (hour >= 12 && hour < 17) return "Добрый день! Время вкусного обеда 🍲";
       if (hour >= 17 && hour < 22) return "Добрый вечер! Что закажем на ужин? 🌙";
       return "Ночные перекусы имеют особый вкус, не так ли? ✨";
+    } else {
+      if (hour >= 5 && hour < 12) return "Good morning! Ready for breakfast? ☕";
+      if (hour >= 12 && hour < 17) return "Good afternoon! Time for a delicious lunch 🍲";
+      if (hour >= 17 && hour < 22) return "Good evening! What shall we order for dinner? 🌙";
+      return "Late night snacks always taste better, right? ✨";
     }
   }, [lang]);
 
@@ -72,17 +77,29 @@ const Order = () => {
         errName: "Пожалуйста, введите полное имя и фамилию!",
         errTable: "Введите правильный номер стола!", errEmpty: "Ваша корзина пуста!",
         errNet: "Ошибка! Проверьте интернет.", success: "Ваш заказ принят!", som: "сум"
+      },
+      en: {
+        back: "Back", title: "Plaza Menu", subTitle: getGreeting(),
+        cartBtn: "Cart", emptyCart: "Your cart is empty", checkout: "Place Order",
+        total: "Total", confirmTitle: "Confirmation", nameLabel: "Full Name",
+        namePlaceholder: "Enter your full name", tableLabel: "Table Number",
+        qrNotice: "(Detected via QR)", cancel: "Back", confirm: "Submit", add: "add",
+        addedNotify: "Added to cart! +1",
+        navs: ['All', 'Main Dishes', 'Salads', 'Drinks', 'Desserts'],
+        errName: "Please enter your full name!",
+        errTable: "Enter a valid table number!", errEmpty: "Your cart is empty!",
+        errNet: "Error! Check your connection.", success: "Order received successfully!", som: "sum"
       }
     };
     return content[lang] || content.uz;
   }, [lang, getGreeting]);
 
   const orderCards = useMemo(() => [
-    { id: 1, img: imgOne, title: lang === 'uz' ? 'Asosiy taom' : 'Основное блюдо', desc: lang === 'uz' ? 'Taomning qisqacha tavsifi' : 'Краткое описание блюда', price: '10000', category: lang === 'uz' ? 'Asosiy taomlar' : 'Основные блюда' },
-    { id: 2, img: imgTwo, title: lang === 'uz' ? 'Salat nomi' : 'Название салата', desc: lang === 'uz' ? 'Salatning qisqacha tavsifi' : 'Краткое описание салата', price: '23000', category: lang === 'uz' ? 'Salatlar' : 'Салаты' },
-    { id: 3, img: imgThree, title: lang === 'uz' ? 'Ichimlik nomi' : 'Напиток', desc: lang === 'uz' ? 'Ichimlikning qisqacha tavsifi' : 'Краткое описание напитка', price: '5000', category: lang === 'uz' ? 'Ichimliklar' : 'Напитки' },
-    { id: 4, img: logo, title: lang === 'uz' ? 'Shirinlik nomi' : 'Десерт', desc: lang === 'uz' ? 'Shirinlikning qisqacha tavsifi' : 'Краткое описание десерта', price: '15000', category: lang === 'uz' ? 'Shirinliklar' : 'Десерты' },
-    { id: 5, img: imgOne, title: lang === 'uz' ? 'Taom nomi' : 'Блюдо', desc: lang === 'uz' ? 'Taomning qisqacha tavsifi' : 'Краткое описание блюда', price: '20000', category: lang === 'uz' ? 'Asosiy taomlar' : 'Основные блюда' },
+    { id: 1, img: imgOne, title: lang === 'en' ? 'Main Dish' : (lang === 'ru' ? 'Основное блюдо' : 'Asosiy taom'), desc: lang === 'en' ? 'Description' : (lang === 'ru' ? 'Описание' : 'Tavsif'), price: '10000', category: lang === 'en' ? 'Main Dishes' : (lang === 'ru' ? 'Основные блюда' : 'Asosiy taomlar') },
+    { id: 2, img: imgTwo, title: lang === 'en' ? 'Salad' : (lang === 'ru' ? 'Салат' : 'Salat nomi'), desc: lang === 'en' ? 'Description' : (lang === 'ru' ? 'Описание' : 'Tavsif'), price: '23000', category: lang === 'en' ? 'Salads' : (lang === 'ru' ? 'Салаты' : 'Salatlar') },
+    { id: 3, img: imgThree, title: lang === 'en' ? 'Drink' : (lang === 'ru' ? 'Напиток' : 'Ichimlik nomi'), desc: lang === 'en' ? 'Description' : (lang === 'ru' ? 'Описание' : 'Tavsif'), price: '5000', category: lang === 'en' ? 'Drinks' : (lang === 'ru' ? 'Напитки' : 'Ichimliklar') },
+    { id: 4, img: logo, title: lang === 'en' ? 'Dessert' : (lang === 'ru' ? 'Десерт' : 'Shirinlik nomi'), desc: lang === 'en' ? 'Description' : (lang === 'ru' ? 'Описание' : 'Tavsif'), price: '15000', category: lang === 'en' ? 'Desserts' : (lang === 'ru' ? 'Десерты' : 'Shirinliklar') },
+    { id: 5, img: imgOne, title: lang === 'en' ? 'Meal' : (lang === 'ru' ? 'Блюдо' : 'Taom nomi'), desc: lang === 'en' ? 'Description' : (lang === 'ru' ? 'Описание' : 'Tavsif'), price: '20000', category: lang === 'en' ? 'Main Dishes' : (lang === 'ru' ? 'Основные блюда' : 'Asosiy taomlar') },
   ], [lang]);
 
   useEffect(() => {
@@ -120,7 +137,7 @@ const Order = () => {
     const token = "8708223354:AAHDfvoi7knAt-ruCQDrKlyvpYOMSjlB6OE";
     const chatId = "8162236227";
     const productList = cart.map((item, index) => `${index + 1}. *${item.title}* (${item.quantity} ta) - ${parseInt(item.price) * item.quantity} ${t.som}`).join('\n');
-    const message = `🍽 *YANGI BUYURTMA*\n👤 Mijoz: ${userName}\n🔢 Stol: ${tableNum}\n\n🛒 Mahsulotlar:\n${productList}\n💰 Jami: ${totalPrice} ${t.som}`;
+    const message = `🍽 *NEW ORDER*\n👤 Customer: ${userName}\n🔢 Table: ${tableNum}\n\n🛒 Products:\n${productList}\n💰 Total: ${totalPrice} ${t.som}`;
 
     try {
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -133,7 +150,7 @@ const Order = () => {
     } catch { toast.error(t.errNet, { position: "bottom-right" }); }
   };
 
-  const filteredCards = activeNav === 'Hammasi' || activeNav === t.navs[0] ? orderCards : orderCards.filter(c => c.category === activeNav);
+  const filteredCards = activeNav === 'Hammasi' || activeNav === 'Все' || activeNav === 'All' || activeNav === t.navs[0] ? orderCards : orderCards.filter(c => c.category === activeNav);
 
   return (
     <OrderPage>

@@ -19,9 +19,8 @@ import imgBanket from '../../assets/buyurtma.avif';
 
 const Reserved = () => {
   const navigate = useNavigate(); 
-  const lang = localStorage.getItem('lang') || 'uz';
+  const lang = useMemo(() => localStorage.getItem('lang') || 'uz', []);
 
-  // Matnlarni useMemo ichiga olamiz, shunda useEffect har gal renderda warning bermaydi
   const t = useMemo(() => {
     const content = {
       uz: {
@@ -39,7 +38,8 @@ const Reserved = () => {
         note: "Band qilish bepul. Tasdiqlash uchun xodimlarimiz bog'lanishadi.",
         confirmBtn: "Joyni band qilish", errorName: "Iltimos, ism va familiyangizni to'liq kiriting!",
         errorDate: "Iltimos, sanani tanlang!", errorTime: "Iltimos, vaqtni belgilang!",
-        errorPhone: "Telefon raqami noto'g'ri!", success: "Joy muvaffaqiyatli band qilindi!", guestSuffix: "kishi"
+        errorPhone: "Telefon raqami noto'g'ri!", success: "Joy muvaffaqiyatli band qilindi!", 
+        guestSuffix: "kishi", errNet: "Xatolik yuz berdi!"
       },
       ru: {
         back: "Назад", title: "Бронирование стола Plaza", subTitle: "Выберите подходящее и уютное место.",
@@ -56,7 +56,26 @@ const Reserved = () => {
         note: "Бронирование бесплатно. Мы свяжемся с вами.",
         confirmBtn: "Забронировать", errorName: "Введите полное имя!",
         errorDate: "Выберите дату!", errorTime: "Выберите время!",
-        errorPhone: "Неверный номер!", success: "Успешно забронировано!", guestSuffix: "чел."
+        errorPhone: "Неверный номер!", success: "Успешно забронировано!", 
+        guestSuffix: "чел.", errNet: "Произошла ошибка!"
+      },
+      en: {
+        back: "Back", title: "Plaza Table Reservation", subTitle: "Choose the most comfortable spot for you.",
+        step1: "1. Select a Zone", step2: "2. Fill in Details",
+        zones: [
+          { id: 1, name: 'Main Hall', desc: 'Live music and festive atmosphere', img: imgZal },
+          { id: 2, name: 'Banquet Rooms', desc: 'Private VIP areas', img: imgBanket },
+          { id: 3, name: 'Open Air', desc: 'Cozy terrace under the stars', img: imgOpenAir },
+        ],
+        labelName: "Full Name", placeholderName: "Enter your full name",
+        labelDate: "Date", labelTime: "Time", labelPhone: "Phone Number", labelGuests: "Guests",
+        labelComment: "Additional Requests (Optional)", placeholderComment: "Write your wishes here...",
+        summary: "Summary", summaryZone: "Zone", summaryGuests: "Guests", summaryDate: "Date", summaryTime: "Time",
+        note: "Booking is free. Our staff will contact you for confirmation.",
+        confirmBtn: "Book Now", errorName: "Please enter your full name!",
+        errorDate: "Please select a date!", errorTime: "Please set a time!",
+        errorPhone: "Invalid phone number!", success: "Table booked successfully!", 
+        guestSuffix: "ppl", errNet: "An error occurred!"
       }
     };
     return content[lang] || content.uz;
@@ -67,7 +86,6 @@ const Reserved = () => {
     fullName: '', phone: '+998', date: '', time: '', guests: '2', comment: ''
   });
 
-  // Til o'zgarganda zonani ham yangilab qo'yish (warning oldini oladi)
   useEffect(() => {
     setSelectedZone(t.zones[0].name);
   }, [t]);
@@ -91,16 +109,26 @@ const Reserved = () => {
 
     const token = "8708223354:AAHDfvoi7knAt-ruCQDrKlyvpYOMSjlB6OE";
     const chatId = "8162236227";
+
+    // Telegram uchun sarlavhalar
+    const msgTitle = lang === 'en' ? 'New Table Reservation' : (lang === 'ru' ? 'Новая бронь стола' : 'Yangi Stol Band Qilindi');
+    const msgCust = lang === 'en' ? 'Customer' : (lang === 'ru' ? 'Клиент' : 'Mijoz');
+    const msgZone = lang === 'en' ? 'Zone' : (lang === 'ru' ? 'Зона' : 'Hudud');
+    const msgGuests = lang === 'en' ? 'Guests' : (lang === 'ru' ? 'Гости' : 'Mehmonlar');
+    const msgDate = lang === 'en' ? 'Date' : (lang === 'ru' ? 'Дата' : 'Sana');
+    const msgTime = lang === 'en' ? 'Time' : (lang === 'ru' ? 'Время' : 'Vaqt');
+    const msgComment = lang === 'en' ? 'Comment' : (lang === 'ru' ? 'Комментарий' : 'Izoh');
+
     const message = `
-🔔 *Yangi Stol Band Qilindi!*
+🔔 *${msgTitle}!*
 ━━━━━━━━━━━━━━━━━━
-👤 *Mijoz:* ${formData.fullName}
+👤 *${msgCust}:* ${formData.fullName}
 📞 *Telefon:* ${formData.phone}
-📍 *Hudud:* ${selectedZone}
-👥 *Mehmonlar:* ${formData.guests} ${t.guestSuffix}
-📅 *Sana:* ${formData.date}
-⏰ *Vaqt:* ${formData.time}
-💬 *Izoh:* ${formData.comment || "Yo'q"}
+📍 *${msgZone}:* ${selectedZone}
+👥 *${msgGuests}:* ${formData.guests} ${t.guestSuffix}
+📅 *${msgDate}:* ${formData.date}
+⏰ *${msgTime}:* ${formData.time}
+💬 *${msgComment}:* ${formData.comment || "-"}
 ━━━━━━━━━━━━━━━━━━`;
 
     try {
@@ -112,7 +140,7 @@ const Reserved = () => {
       toast.success(t.success);
       setFormData({ fullName: '', phone: '+998', date: '', time: '', guests: '2', comment: '' });
     } catch (err) {
-      toast.error("Xatolik yuz berdi!");
+      toast.error(t.errNet);
     }
   };
 
@@ -161,7 +189,7 @@ const Reserved = () => {
                 <InputBlock>
                   <label>{t.labelGuests}</label>
                   <select name="guests" value={formData.guests} onChange={handleInput}>
-                    {[1, 2, 4, 6, 10, 20].map(n => <option key={n} value={n}>{n} {t.guestSuffix}</option>)}
+                    {[1, 2, 4, 6, 10, 20, 50].map(n => <option key={n} value={n}>{n} {t.guestSuffix}</option>)}
                   </select>
                 </InputBlock>
               </TwoColumn>
